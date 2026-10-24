@@ -1,0 +1,54 @@
+---
+import Card from "./Card.astro";
+import SectionLabel from "./SectionLabel.astro";
+import { Icon } from "astro-icon/components";
+
+const intro = {
+    heading: "I'm Nitin",
+    description:
+        "Computer Engineering graduate focused on systems programming, Linux internals, and crafting minimal developer tools. I enjoy building fast, lightweight software in C with an emphasis on simplicity, performance, and clean architecture.",
+};
+---
+
+<section>
+    <div class="mb-2">
+        <SectionLabel text="01. Intro" />
+    </div>
+    <Card>
+        <div class="space-y-3">
+            <h1 class="text-2xl font-bold tracking-tight text-zinc-100">
+                {intro.heading}
+            </h1>
+            <p class="text-sm sm:text-base leading-relaxed text-zinc-400">
+                {intro.description}
+            </p>
+        </div>
+        <div class="mt-5 flex items-center gap-5 font-mono text-xs text-zinc-400">
+            <a
+                href="https://github.com/nitinbhat972"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center gap-1.5 transition-colors hover:text-white"
+            >
+                <Icon name="lucide:github" class="size-4" />
+                <span>GitHub</span>
+            </a>
+            <a
+                href="/resume.pdf"
+                target="_blank"
+                download
+                class="flex items-center gap-1.5 transition-colors hover:text-white"
+            >
+                <Icon name="lucide:file-down" class="size-4" />
+                <span>Resume</span>
+            </a>
+            <a
+                href="mailto:nitinbhat972@gmail.com"
+                class="flex items-center gap-1.5 transition-colors hover:text-white"
+            >
+                <Icon name="lucide:mail" class="size-4" />
+                <span>Contact</span>
+            </a>
+        </div>
+    </Card>
+</section>

@@ -1,0 +1,152 @@
+---
+import { getCollection } from "astro:content";
+import MainLayout from "../../layouts/MainLayout.astro";
+import Card from "../../components/Card.astro";
+import SectionLabel from "../../components/SectionLabel.astro";
+import { Icon } from "astro-icon/components";
+
+const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<MainLayout
+    title="Blog — Nitin Bhat"
+    description="Writing about Linux, C, systems programming, and the things I build."
+>
+    <div class="space-y-10">
+        <section>
+            <div class="mb-2">
+                <SectionLabel text="Blog" />
+            </div>
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight text-zinc-100">
+                    Writing & Notes
+                </h1>
+                <p class="mt-2 text-sm sm:text-base text-zinc-400 leading-relaxed max-w-2xl">
+                    Deep dives, tutorials, and engineering notes on systems
+                    programming, Linux internals, and building minimal tools.
+                </p>
+            </div>
+        </section>
+
+        <div class="space-y-4">
+            <div class="flex items-center justify-between border-b border-zinc-900 pb-3">
+                <SectionLabel text="Browse posts" />
+                <div class="relative w-44 shrink-0">
+                    <Icon
+                        name="lucide:search"
+                        class="absolute left-0 top-1/2 size-3.5 -translate-y-1/2 text-zinc-600 pointer-events-none"
+                    />
+                    <input
+                        id="blog-search"
+                        type="search"
+                        placeholder="search..."
+                        aria-label="Search blog posts"
+                        class="w-full border-b border-zinc-800 bg-transparent pb-1 pl-5 pr-1 font-mono text-xs text-zinc-300 placeholder:text-zinc-600 outline-none transition-colors hover:border-zinc-600 focus:border-zinc-600"
+                    />
+                </div>
+            </div>
+
+            {posts.length > 0 && (
+                <div
+                    id="no-results"
+                    class="hidden py-10 text-center font-mono text-xs text-zinc-500"
+                >
+                    No matching posts found.
+                </div>
+            )}
+
+            <div id="posts-list" class="space-y-4">
+                {posts.length > 0 ? (
+                    posts.map((post) => {
+                        const formattedDate = new Date(
+                            post.data.pubDate
+                        ).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                        });
+
+                        return (
+                            <a
+                                href={`/blog/${post.id}`}
+                                class="post-item group block"
+                                data-search={`${post.data.title} ${post.data.description} ${post.data.tags.join(" ")}`.toLowerCase()}
+                            >
+                                <Card>
+                                    <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 mb-1.5">
+                                        <div class="flex items-center gap-2">
+                                            <h2 class="font-semibold text-zinc-100 group-hover:text-white transition-colors text-base sm:text-lg">
+                                                {post.data.title}
+                                            </h2>
+                                            <Icon
+                                                name="lucide:arrow-up-right"
+                                                class="size-4 shrink-0 text-zinc-500 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-zinc-200"
+                                            />
+                                        </div>
+
+                                        <div class="flex items-center gap-2 font-mono text-xs text-zinc-500 shrink-0">
+                                            <span>{formattedDate}</span>
+                                            {post.data.readTime && (
+                                                <>
+                                                    <span>•</span>
+                                                    <span>{post.data.readTime}</span>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+                                        {post.data.description}
+                                    </p>
+
+                                    <div class="mt-4 flex flex-wrap items-center gap-1.5">
+                                        {post.data.tags.map((tag) => (
+                                            <span class="rounded border border-zinc-800 bg-zinc-900/80 px-2 py-0.5 font-mono text-2xs text-zinc-400">
+                                                {tag}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </Card>
+                            </a>
+                        );
+                    })
+                ) : (
+                    <div
+                        class="px-5 py-8 text-center font-mono text-xs text-zinc-500"
+                    >
+                        No posts yet.
+                    </div>
+                )}
+            </div>
+        </div>
+    </div>
+</MainLayout>
+
+<script>
+    function setupSearch() {
+        const input = document.getElementById("blog-search") as HTMLInputElement;
+        const list = document.getElementById("posts-list");
+        const empty = document.getElementById("no-results");
+        if (!input || !list) return;
+
+        const items = list.querySelectorAll<HTMLElement>(".post-item");
+
+        input.addEventListener("input", () => {
+            const q = input.value.toLowerCase().trim();
+            let matches = 0;
+
+            items.forEach((item) => {
+                const text = item.dataset.search || "";
+                const matched = text.includes(q);
+                item.style.display = matched ? "" : "none";
+                if (matched) matches++;
+            });
+
+            if (empty) empty.classList.toggle("hidden", matches > 0);
+        });
+    }
+
+    setupSearch();
+</script>

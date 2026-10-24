@@ -1,0 +1,64 @@
+---
+import { getCollection } from "astro:content";
+import Card from "./Card.astro";
+import SectionLabel from "./SectionLabel.astro";
+import { Icon } from "astro-icon/components";
+
+const recentPosts = (
+    await getCollection("blog", ({ data }) => !data.draft)
+)
+    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+    .slice(0, 3);
+---
+
+{recentPosts.length > 0 && (
+    <section>
+        <div class="mb-3 flex items-center justify-between">
+            <SectionLabel text="03. Recent Posts" />
+            <a
+                href="/blog"
+                class="flex items-center gap-1 font-mono text-xs text-zinc-500 transition-colors hover:text-zinc-300"
+            >
+                <span>all posts</span>
+                <Icon name="lucide:arrow-up-right" class="size-3.5" />
+            </a>
+        </div>
+
+        <div class="space-y-3">
+            {
+            recentPosts.map((post) => {
+                const formattedDate = new Date(
+                    post.data.pubDate
+                ).toLocaleDateString("en-US", {
+                    month: "short",
+                    year: "numeric",
+                });
+
+                return (
+                    <a href={`/blog/${post.id}`} class="group block">
+                        <Card>
+                            <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 mb-1">
+                                <h3 class="font-semibold text-zinc-100 group-hover:text-white transition-colors">
+                                    {post.data.title}
+                                </h3>
+                                <div class="flex items-center gap-2 font-mono text-xs text-zinc-500 shrink-0">
+                                    <span>{formattedDate}</span>
+                                    {post.data.readTime && (
+                                        <>
+                                            <span>•</span>
+                                            <span>{post.data.readTime}</span>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                            <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+                                {post.data.description}
+                            </p>
+                        </Card>
+                    </a>
+                );
+            })
+            }
+        </div>
+    </section>
+)}

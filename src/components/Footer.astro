@@ -1,0 +1,41 @@
+---
+import { Icon } from "astro-icon/components";
+---
+
+<footer
+    class="border-t border-zinc-800/70 py-8 text-xs font-mono text-zinc-500"
+>
+    <div
+        class="mx-auto flex max-w-5xl flex-col gap-2 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6"
+    >
+        <div class="flex items-center gap-2">
+            <span>© {new Date().getFullYear()} Nitin Bhat</span>
+            <span class="text-zinc-500">·</span>
+            <a
+                href="/rss.xml"
+                class="flex items-center gap-1.5 transition-colors hover:text-white"
+            >
+                <Icon name="lucide:rss" class="size-3.5" />
+                <span>RSS</span>
+            </a>
+        </div>
+        <span class="flex items-center gap-2">
+            <span>made with</span>
+            <span class="inline-flex items-center gap-0.5">
+                <a
+                    href="https://astro.build"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-zinc-400 transition-colors hover:text-white"
+                >Astro</a>
+                <span class="text-zinc-700">+</span>
+                <a
+                    href="https://tailwindcss.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-zinc-400 transition-colors hover:text-white"
+                >Tailwind</a>
+            </span>
+        </span>
+    </div>
+</footer>

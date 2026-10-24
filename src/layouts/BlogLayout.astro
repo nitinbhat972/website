@@ -1,0 +1,310 @@
+---
+import MainLayout from "./MainLayout.astro";
+import SectionLabel from "../components/SectionLabel.astro";
+import { Icon } from "astro-icon/components";
+
+interface Heading {
+    depth: number;
+    slug: string;
+    text: string;
+}
+
+interface SeriesPart {
+    title: string;
+    slug: string;
+    isCurrent?: boolean;
+}
+
+interface NavPost {
+    title: string;
+    slug: string;
+}
+
+interface Props {
+    title: string;
+    description?: string;
+    pubDate?: Date | string;
+    readTime?: string;
+    tags?: string[];
+    headings?: Heading[];
+    series?: {
+        parts: SeriesPart[];
+    };
+    prevPost?: NavPost;
+    nextPost?: NavPost;
+}
+
+const {
+    title,
+    description,
+    pubDate,
+    readTime = "5 min read",
+    tags = [],
+    headings = [],
+    series,
+    prevPost,
+    nextPost,
+} = Astro.props;
+
+const formattedDate = pubDate
+    ? new Date(pubDate).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+      })
+    : undefined;
+
+const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+<MainLayout title={`${title} — Nitin Bhat`} description={description}>
+    <div class="relative w-full">
+        <aside class="absolute top-0 right-full bottom-0 hidden w-52 mr-10 font-mono text-xs article-rails:block">
+            <div class="sticky top-8 space-y-6">
+                <a
+                    href="/blog"
+                    class="inline-flex items-center gap-1.5 text-zinc-400 transition-colors hover:text-white"
+                >
+                    <Icon name="lucide:arrow-left" class="size-3.5" />
+                    <span>all posts</span>
+                </a>
+
+                <div>
+                    <SectionLabel text="Post details" class="block mb-4" />
+                    <div class="space-y-4">
+                        {formattedDate && (
+                            <div>
+                                <span class="block mb-1 text-2xs uppercase text-zinc-500">
+                                    Published
+                                </span>
+                                <span class="text-zinc-300">{formattedDate}</span>
+                            </div>
+                        )}
+
+                        {readTime && (
+                            <div>
+                                <span class="block mb-1 text-2xs uppercase text-zinc-500">
+                                    Read Time
+                                </span>
+                                <span class="text-zinc-300">{readTime}</span>
+                            </div>
+                        )}
+
+                        {tags.length > 0 && (
+                            <div>
+                                <span class="block mb-1.5 text-2xs uppercase text-zinc-500">
+                                    Tags
+                                </span>
+                                <div class="flex flex-wrap gap-1">
+                                    {tags.map((tag) => (
+                                        <span class="rounded border border-zinc-800 bg-zinc-900/80 px-1.5 py-0.5 text-2xs text-zinc-400">
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {series && series.parts.length > 1 && (
+                    <div class="border-t border-zinc-800 pt-6 space-y-2">
+                        <div class="flex items-center justify-between text-2xs uppercase text-zinc-500">
+                            <SectionLabel text="Series" />
+                            <span>{series.parts.length} parts</span>
+                        </div>
+                        <nav class="space-y-1 pt-1">
+                            {series.parts.map((part) => (
+                                <a
+                                    href={`/blog/${part.slug}`}
+                                    class:list={[
+                                        "block py-1.5 px-2 rounded text-xs transition-colors",
+                                        part.isCurrent
+                                            ? "bg-zinc-800 text-white font-medium"
+                                            : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900",
+                                    ]}
+                                >
+                                    <span>{part.title}</span>
+                                </a>
+                            ))}
+                        </nav>
+                    </div>
+                )}
+            </div>
+        </aside>
+
+        <article class="w-full min-w-0">
+            <div class="mb-6 article-rails:hidden">
+                <a
+                    href="/blog"
+                    class="inline-flex items-center gap-1.5 font-mono text-xs text-zinc-400 transition-colors hover:text-white mb-4"
+                >
+                    <Icon name="lucide:arrow-left" class="size-3.5" />
+                    <span>all posts</span>
+                </a>
+            </div>
+
+            <header class="mb-8 border-b border-zinc-800 pb-6">
+                <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-100 mb-3">
+                    {title}
+                </h1>
+                {description && (
+                    <p class="text-sm sm:text-base text-zinc-400 leading-relaxed">
+                        {description}
+                    </p>
+                )}
+
+                <div class="mt-4 flex flex-wrap items-center gap-3 font-mono text-xs text-zinc-500 article-rails:hidden">
+                    {formattedDate && <span>{formattedDate}</span>}
+                    {readTime && (
+                        <>
+                            <span>•</span>
+                            <span>{readTime}</span>
+                        </>
+                    )}
+                    {tags.length > 0 && (
+                        <div class="flex flex-wrap gap-1.5">
+                            {tags.map((tag) => (
+                                <span class="rounded border border-zinc-800 bg-zinc-900/80 px-1.5 py-0.5 text-2xs text-zinc-400">
+                                    {tag}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {series && series.parts.length > 1 && (
+                    <div class="mt-5 rounded-lg border border-zinc-800 bg-zinc-900/50 p-3 article-rails:hidden">
+                        <SectionLabel text="Series" class="block mb-1" />
+                        <div class="flex flex-wrap gap-1.5">
+                            {series.parts.map((part) => (
+                                <a
+                                    href={`/blog/${part.slug}`}
+                                    class:list={[
+                                        "px-2 py-0.5 rounded font-mono text-xs transition-colors",
+                                        part.isCurrent
+                                            ? "bg-zinc-800 text-white font-medium"
+                                            : "text-zinc-400 hover:text-zinc-200 bg-zinc-900",
+                                    ]}
+                                >
+                                    {part.title}
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </header>
+
+            <div class="prose prose-invert prose-zinc max-w-none prose-headings:scroll-mt-20 prose-headings:font-semibold prose-a:text-zinc-300 prose-a:no-underline hover:prose-a:underline prose-code:font-mono prose-code:text-zinc-200">
+                <slot />
+            </div>
+
+            {(prevPost || nextPost) && (
+                <nav class="mt-12 pt-6 border-t border-zinc-800 flex items-center justify-between gap-4 font-mono text-xs">
+                    {prevPost ? (
+                        <a
+                            href={`/blog/${prevPost.slug}`}
+                            class="group flex flex-col gap-1 text-zinc-500 hover:text-zinc-200 transition-colors"
+                        >
+                            <span class="flex items-center gap-1">
+                                <Icon name="lucide:arrow-left" class="size-3" />
+                                previous
+                            </span>
+                            <span class="font-sans text-sm text-zinc-300 group-hover:text-white transition-colors line-clamp-1">
+                                {prevPost.title}
+                            </span>
+                        </a>
+                    ) : <div />}
+
+                    {nextPost && (
+                        <a
+                            href={`/blog/${nextPost.slug}`}
+                            class="group flex flex-col gap-1 items-end text-right text-zinc-500 hover:text-zinc-200 transition-colors"
+                        >
+                            <span class="flex items-center gap-1">
+                                next
+                                <Icon name="lucide:arrow-right" class="size-3" />
+                            </span>
+                            <span class="font-sans text-sm text-zinc-300 group-hover:text-white transition-colors line-clamp-1">
+                                {nextPost.title}
+                            </span>
+                        </a>
+                    )}
+                </nav>
+            )}
+        </article>
+
+        <aside class="absolute top-0 bottom-0 left-full hidden w-52 ml-10 font-mono text-xs article-rails:block">
+            <div class="sticky top-8 space-y-4">
+                <SectionLabel text="On This Page" class="block mb-3" />
+
+                {tocHeadings.length > 0 ? (
+                    <nav class="space-y-2 border-l border-zinc-800 pl-3">
+                        {tocHeadings.map((heading) => (
+                            <a
+                                href={`#${heading.slug}`}
+                                data-heading-id={heading.slug}
+                                class:list={[
+                                    "toc-link block transition-colors line-clamp-1 text-zinc-500 hover:text-zinc-200",
+                                    heading.depth === 3 ? "pl-2" : "",
+                                ]}
+                            >
+                                {heading.text}
+                            </a>
+                        ))}
+                    </nav>
+                ) : (
+                    <span class="text-zinc-600 text-xs">No sections</span>
+                )}
+            </div>
+        </aside>
+    </div>
+</MainLayout>
+
+<script>
+    function setupScrollSpy() {
+        const links = document.querySelectorAll<HTMLAnchorElement>(".toc-link");
+        if (!links.length) return;
+
+        const headingIds = Array.from(links).map((link) => link.dataset.headingId);
+        const headings = headingIds
+            .map((id) => (id ? document.getElementById(id) : null))
+            .filter((el): el is HTMLElement => el !== null);
+
+        if (!headings.length) return;
+
+        function setActive(currentId: string) {
+            links.forEach((link) => {
+                const isActive = link.dataset.headingId === currentId;
+                if (isActive) {
+                    link.classList.remove("text-zinc-500");
+                    link.classList.add("text-white", "font-medium");
+                } else {
+                    link.classList.remove("text-white", "font-medium");
+                    link.classList.add("text-zinc-500");
+                }
+            });
+        }
+
+        function updateActive() {
+            const firstHeading = headings[0];
+            if (!firstHeading) return;
+
+            let currentId = firstHeading.id;
+
+            for (const heading of headings) {
+                if (heading.getBoundingClientRect().top <= 140) {
+                    currentId = heading.id;
+                }
+            }
+
+            setActive(currentId);
+        }
+
+        window.addEventListener("scroll", updateActive, { passive: true });
+        window.addEventListener("hashchange", updateActive);
+        updateActive();
+    }
+
+    setupScrollSpy();
+</script>

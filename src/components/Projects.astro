@@ -1,0 +1,90 @@
+---
+import Card from "./Card.astro";
+import SectionLabel from "./SectionLabel.astro";
+import { Icon } from "astro-icon/components";
+
+interface Project {
+    title: string;
+    description: string;
+    tags: string[];
+    link: string;
+}
+
+const projects: Project[] = [
+    {
+        title: "cwal",
+        description: "Blazing-fast pywal-like color palette generator written in C.",
+        tags: ["C", "CLI", "Linux"],
+        link: "https://github.com/nitinbhat972/cwal",
+    },
+    {
+        title: "cwal.nvim",
+        description: "Dynamic Neovim colorscheme using cwal-generated palettes.",
+        tags: ["Lua", "Neovim"],
+        link: "https://github.com/nitinbhat972/cwal.nvim",
+    },
+    {
+        title: "notfm",
+        description: "A terminal based filemanager written in C23.",
+        tags: ["C", "CLI", "TUI"],
+        link: "https://github.com/nitinbhat972/notfm",
+    },
+    {
+        title: "svar",
+        description: "Minimal synced lyrics viewer written in Rust.",
+        tags: ["Rust", "TUI"],
+        link: "https://github.com/nitinbhat972/svar",
+    },
+];
+---
+
+<section>
+    <div class="mb-3 flex items-center justify-between">
+        <SectionLabel text="02. Projects" />
+        <a
+            href="https://github.com/nitinbhat972?tab=repositories"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-1 font-mono text-xs text-zinc-500 transition-colors hover:text-zinc-300"
+        >
+            <span>view github</span>
+            <Icon name="lucide:arrow-up-right" class="size-3.5" />
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {
+            projects.map((project) => (
+                <a
+                    href={project.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="group"
+                >
+                    <Card class="h-full flex flex-col justify-between">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-semibold text-zinc-100 group-hover:text-white transition-colors">
+                                {project.title}
+                            </h3>
+                            <Icon
+                                name="lucide:arrow-up-right"
+                                class="size-4 text-zinc-500 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-zinc-200"
+                            />
+                        </div>
+                        <p class="text-xs text-zinc-400 leading-relaxed">
+                            {project.description}
+                        </p>
+
+                        <div class="mt-4 flex flex-wrap gap-1.5 pt-2">
+                            {project.tags.map((tag) => (
+                                <span class="rounded border border-zinc-800 bg-zinc-900/80 px-2 py-0.5 font-mono text-2xs text-zinc-400">
+                                    {tag}
+                                </span>
+                            ))}
+                        </div>
+                    </Card>
+                </a>
+            ))
+        }
+    </div>
+</section>

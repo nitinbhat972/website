@@ -1,0 +1,75 @@
+---
+import { getCollection, render } from "astro:content";
+import BlogLayout from "../../layouts/BlogLayout.astro";
+
+export async function getStaticPaths() {
+    const allPosts = await getCollection("blog", ({ data }) => !data.draft);
+    const sortedPosts = [...allPosts].sort(
+        (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+    );
+
+    return allPosts.map((post) => {
+        const slug = post.id;
+        const parts = post.id.split("/");
+        const isMultipart = parts.length > 1;
+        const seriesDir = isMultipart ? parts[0] : null;
+
+        let series = undefined;
+        if (seriesDir) {
+            const seriesPosts = allPosts
+                .filter((p) => p.id.startsWith(seriesDir + "/"))
+                .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
+
+            if (seriesPosts.length > 1) {
+                series = {
+                    parts: seriesPosts.map((p) => ({
+                        title: p.data.title,
+                        slug: p.id,
+                        isCurrent: p.id === post.id,
+                    })),
+                };
+            }
+        }
+
+        const currentIndex = sortedPosts.findIndex((p) => p.id === post.id);
+
+        const previousPost = sortedPosts[currentIndex + 1];
+        const prevPost = previousPost
+            ? {
+                  title: previousPost.data.title,
+                  slug: previousPost.id,
+              }
+            : undefined;
+
+        const followingPost = sortedPosts[currentIndex - 1];
+        const nextPost = followingPost
+            ? {
+                  title: followingPost.data.title,
+                  slug: followingPost.id,
+              }
+            : undefined;
+
+        return {
+            params: { slug },
+            props: { post, series, prevPost, nextPost },
+        };
+    });
+}
+
+const { post, series, prevPost, nextPost } = Astro.props;
+const { Content, headings } = await render(post);
+---
+
+<BlogLayout
+    title={post.data.title}
+    description={post.data.description}
+    pubDate={post.data.pubDate}
+    readTime={post.data.readTime}
+    tags={post.data.tags}
+    headings={headings}
+    series={series}
+    prevPost={prevPost}
+    nextPost={nextPost}
+>
+    <Content />
+</BlogLayout>
